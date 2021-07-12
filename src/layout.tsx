@@ -48,10 +48,10 @@ const useStyles = makeStyles({
   },
 });
 
-const App:React.FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+const Layout:React.FC = () => {
   const { items } = useTypeSelector((state) => state.item);
   const [about, setAbout] = useState<string>('');
+  const [errorState, setErrorState] = useState<boolean>(false);
   const dispatch = useDispatch();
   const styles = useStyles();
   useEffect(() => {
@@ -65,15 +65,21 @@ const App:React.FC = () => {
       React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.preventDefault();
-    const idItem = items.length !== 0 ? items[items.length - 1].id + 1 : 0;
-    await dispatch(addItem(idItem, about, items));
+    if (about.length === 0) {
+      setErrorState(true);
+    } else {
+      setErrorState(false);
+      const idItem = items.length !== 0 ? items[items.length - 1].id + 1 : 1;
+      await dispatch(addItem(idItem, about, items));
+    }
   };
   return (
     <Paper className={styles.paper}>
       <Container className={styles.containerInput}>
         <TextField
+          error={errorState}
           id="outlined-required"
-          label="Task"
+          label={errorState ? 'Пустая строка' : 'Task'}
           variant="outlined"
           className={styles.inputData}
           onChange={(e) => aboutTaskChange(e)}
@@ -88,4 +94,4 @@ const App:React.FC = () => {
     </Paper>
   );
 };
-export default App;
+export default Layout;
